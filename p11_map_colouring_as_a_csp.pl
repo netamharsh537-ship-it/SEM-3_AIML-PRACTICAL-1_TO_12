@@ -2,28 +2,18 @@ color(red).
 color(green).
 color(blue).
 
-regions([wa, nt, sa, q, nsw, v, t]).
+different(X,Y) :- X \= Y.
 
-adjacent(wa,  nt).   adjacent(wa,  sa).
-adjacent(nt,  sa).   adjacent(nt,  q).
-adjacent(sa,  q).    adjacent(sa,  nsw).
-adjacent(sa,  v).    adjacent(q,   nsw).
-adjacent(nsw, v).
-
-% Conflict if a neighbour already has colour C
-conflict(R, C, Assigned) :-
-    member(R2-C, Assigned),
-    ( adjacent(R, R2) ; adjacent(R2, R) ).
-
-% Backtracking assignment
-assign([], A, A).
-assign([R|Rs], Assigned, Result) :-
+map(A,B,C,D) :-
+    color(A),
+    color(B),
     color(C),
-    \+ conflict(R, C, Assigned),
-    assign(Rs, [R-C|Assigned], Result).
+    color(D),
 
-solve(Result) :- regions(Rs), assign(Rs, [], Result).
+    different(A,B),
+    different(A,C),
+    different(B,C),
+    different(B,D),
+    different(C,D).
 
-show :- solve(R), reverse(R, Ordered),
-        forall(member(Region-Col, Ordered),
-               format("~w -> ~w~n", [Region, Col])).
+% map(A,B,C,D).
