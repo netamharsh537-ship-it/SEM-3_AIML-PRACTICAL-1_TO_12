@@ -1,14 +1,23 @@
-f(X, Y) :- Y is -(X - 3) * (X - 3) + 10.
+value(1,5).
+value(2,8).
+value(3,9).
+value(4,8).
+value(5,5).
 
-% hill_climb(CurrentX, BestX)
-hill_climb(X, Best) :-
-    Xr is X + 1,  Xl is X - 1,
-    f(X, Fx),  f(Xr, Fr),  f(Xl, Fl),
-    (   Fr > Fx, Fr >= Fl -> hill_climb(Xr, Best)     % move right
-    ;   Fl > Fx           -> hill_climb(Xl, Best)     % move left
-    ;   Best = X                                      % no better neighbour: peak
-    ).
+hill_climb(X,Best):-
+    climb(X,Best).
 
-run(Start) :-
-    hill_climb(Start, B), f(B, V),
-    format("Start = ~w, Best x = ~w, f(x) = ~w~n", [Start, B, V]).
+climb(X,X):-
+    \+ better(X,_).
+
+climb(X,Best):-
+    better(X,Y),
+    climb(Y,Best).
+
+better(X,Y):-
+    value(X,V1),
+    Y is X+1,
+    value(Y,V2),
+    V2 > V1.
+
+% hill_climb(1,Best).
