@@ -1,23 +1,15 @@
-% teaches(Faculty, Subject)
-teaches(dr_sharma, ai).
-teaches(dr_patil,  dbms).
-teaches(dr_khan,   os).
-teaches(dr_sharma, ml).
+timetable(monday,"9:00",python,ajay,101).
+timetable(monday,"10:00",aiml,sanjay,102).
+timetable(tuesday,"9:00",english,amit,102).
+timetable(tuesday,"11:00",maths,iyer,102).
+timetable(wednesday,"9:00",aiml,sanjay,101).
+timetable(wednesday,"10:00",english,amit,102).
+faculty_sc(Faculty,Day,Time,Subject,Room):-
+    timetable(Day,Time,Subject,Faculty,Room).
 
-% room(Subject, Classroom)
-room(ai,   r101).
-room(dbms, r102).
-room(os,   r103).
-room(ml,   r101).
+find_faculty(Subject,Faculty):-     
+    timetable(_,_,Subject,Faculty,_).
 
-% slot(Subject, Day, Time)
-slot(ai,   monday,    '9:00').
-slot(dbms, monday,    '10:00').
-slot(os,   tuesday,   '9:00').
-slot(ml,   wednesday, '11:00').
+class_sc(Room,Day,Time,Subject,Faculty):-
+    timetable(Day,Time,Subject,Faculty,Room).
 
-% ---- Rules ----
-faculty_room(F, R)     :- teaches(F, S), room(S, R).
-faculty_schedule(F, S, D, T) :- teaches(F, S), slot(S, D, T).
-day_subjects(D, S)     :- slot(S, D, _).
-clash(S1, S2) :- slot(S1, D, T), slot(S2, D, T), S1 \= S2.
