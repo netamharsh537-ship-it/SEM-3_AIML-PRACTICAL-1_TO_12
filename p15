@@ -1,0 +1,108 @@
+
+# Practical 15: Resolution Principle and Unification in FOL
+
+def is_variable(x):
+    return x.startswith("?")
+
+def apply_substitution(term, substitution):
+    while is_variable(term) and term in substitution:
+        term = substitution[term]
+    return term
+
+def unify(x, y, substitution):
+    x = apply_substitution(x, substitution)
+    y = apply_substitution(y, substitution)
+
+    if x == y:
+        return substitution
+
+    if is_variable(x):
+        substitution[x] = y
+        return substitution
+
+    if is_variable(y):
+        substitution[y] = x
+        return substitution
+
+    return None
+
+
+def resolve(clause1, clause2):
+    for i, lit1 in enumerate(clause1):
+        for j, lit2 in enumerate(clause2):
+
+            # Check opposite literals
+            if lit1[0] != lit2[0] and lit1[1] == lit2[1]:
+
+                substitution = {}
+
+                for a, b in zip(lit1[2], lit2[2]):
+                    substitution = unify(a, b, substitution)
+                    if substitution is None:
+                        break
+
+                if substitution is not None:
+                    new_clause = []
+
+                    for k, lit in enumerate(clause1):
+                        if k != i:
+                            args = tuple(
+                                apply_substitution(a, substitution)
+                                for a in lit[2]
+                            )
+                            new_clause.append((lit[0], lit[1], args))
+
+                    for k, lit in enumerate(clause2):
+                        if k != j:
+                            args = tuple(
+                                apply_substitution(a, substitution)
+                                for a in lit[2]
+                            )
+                            new_clause.append((lit[0], lit[1], args))
+
+                    return new_clause, substitution
+
+    return None, None
+
+
+# Knowledge Base:
+# All humans are mortal.
+# Human(Socrates)
+#
+# Goal: Mortal(Socrates)
+
+clauses = [
+    [(False, "Human", ("?x",)),
+     (True, "Mortal", ("?x",))],
+
+    [(True, "Human", ("Socrates",))],
+
+    # Negation of the goal
+    [(False, "Mortal", ("Socrates",))]
+]
+
+print("Initial Clauses:")
+for c in clauses:
+    print(c)
+
+print("\nApplying Resolution and Unification...\n")
+
+result1, sub1 = resolve(clauses[0], clauses[1])
+
+if result1 is not None:
+    print("Step 1: Unification =", sub1)
+    print("Step 1: Resolvent =", result1)
+
+    result2, sub2 = resolve(result1, clauses[2])
+
+    if result2 is not None:
+        print("Step 2: Unification =", sub2)
+        print("Step 2: Resolvent =", result2)
+
+        if len(result2) == 0:
+            print("\nEmpty Clause (Contradiction) Found!")
+            print("Theorem Proved Successfully!")
+    else:
+        print("Resolution failed in Step 2.")
+else:
+    print("Resolution failed in Step 1.")
